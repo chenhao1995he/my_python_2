@@ -51,13 +51,14 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    # django默认开启用户认证模块的中间件
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 )
-
+# AUTH_USER_MODEL = 'users.User'
 ROOT_URLCONF = 'dailyfresh.urls'
 
 TEMPLATES = [
@@ -86,7 +87,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'dailyfresh',
-        'HOST': '192.168.115.38', # MySQL数据库地址
+        'HOST': '192.168.115.22', # MySQL数据库地址
         'PORT': '3306',
         'USER': 'root',
         'PASSWORD': 'mysql',
