@@ -58,7 +58,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 )
-# AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.User'
 ROOT_URLCONF = 'dailyfresh.urls'
 
 TEMPLATES = [
@@ -87,7 +87,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'dailyfresh',
-        'HOST': '192.168.115.22', # MySQL数据库地址
+        'HOST': '192.168.110.130', # MySQL数据库地址
         'PORT': '3306',
         'USER': 'root',
         'PASSWORD': 'mysql',
