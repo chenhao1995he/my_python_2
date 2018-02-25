@@ -141,3 +141,6 @@ CACHES = {
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
+# 在使用装饰器@login_required时，需要配置settings.py文件
+# 用于指定装饰器@login_required验证失败后跳转到的路径
+LOGIN_URL = '/users/login'

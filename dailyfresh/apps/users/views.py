@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.views.generic import View
 # 反向解析
 from django.core.urlresolvers import reverse
-from users.models import User
+from users.models import User, Address
 from django import db
 from celery_tasks.tasks import send_active_email
 import re
@@ -11,7 +11,92 @@ from django.conf import settings
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from utils.views import LoginRequiredMixin
+from django_redis import get_redis_connection
 # Create your views here.
+
+
+class UserInfoView(LoginRequiredMixin, View):
+    """用户中心"""
+    def get(self, request):
+        """查询用户信息和地址信息"""
+        # 从request中获取user对象,中间件从验证请求中的用户,所以request中带由user
+        user = request.user
+        try:
+            # 查询用户地址,根据创建时间排序,取第1个地址
+            address = user.address_set.latest('create_time')
+        except Address.DoesNotExist:
+            # 如果地址信息不存在
+            address = None
+
+        # 构造上下文
+        context = {
+            'address': address
+        }
+        # 渲染模板
+        return render(request, 'user_center_info.html', context)
+        # 创建redis连接对象
+        redis_connection = get_redis_connection('default')
+        # 从Redis中获取用户浏览商品的sku_id，在redis中需要维护商品浏览顺序[8,2,5]
+        sku_ids = redis_connection.lranage('histtory_%s'% user.id, 0, 4)
+        # 从数据库查询sku信息,范围在sku_ids中
+        # skuList = GoodsSKU.object.filter(id__in=sku_ids)
+        # 问题,经过数据库查询后得到skuList, 就不再是redis中维护的顺序了,而是[2,5,8]
+        # 需求: 保证经过数据库查询后,依然是[8,2,5]
+        skuList = []
+        for sku_id in sku_ids:
+            sku = GoodsSKU.objects.get(id=sku_id)
+            skuList.append(sku)
+        # 构造上下文
+        context = {
+            'address': address,
+            'skuList':skuList,
+        }
+        # 调出并渲染模板
+        return render(request, 'user_center_info.html', context)
+
+
+
+class AddressView(LoginRequiredMixin, View):
+    """用户地址"""
+    def get(self, request):
+        """提供用户地址页面"""
+        # 或取登陆用户
+        user = request.user
+        # 查询数据
+        try:
+            address = user.address_set.latest('create_time')
+        except Address.DoesNotExist:
+            address = None
+        # 构造上下文
+        context = {
+            'address': address
+        }
+        # 渲染模板
+        return render(request, 'user_center_site.html', context)
+
+    def post(self, request):
+        """修改地址信息"""
+        # 接受编辑的地址参数
+        user = request.user
+        recv_name = request.POST.get('recv_name')
+        addr = request.POST.get('addr')
+        zip_code = request.POST.get('zip_code')
+        recv_mobile = request.POST.get('recv_mobile')
+        # 校验地址参数
+        if all([recv_name, addr, zip_code, recv_mobile]):
+            # 保存地址参数
+            Address.objects.create(
+                user=user,
+                receiver_name=recv_name,
+                detail_addr=addr,
+                zip_code=zip_code,
+                receiver_mobile=recv_mobile,
+            )
+
+        # 响应结果
+        return redirect(reverse('users:address'))
 
 
 class LogoutView(View):
@@ -22,6 +107,7 @@ class LogoutView(View):
         logout(request)
         # 退出跳转, 由产品经理设计
         return redirect(reverse('goods: index'))
+
 
 class LoginView(View):
     """登陆"""
@@ -59,7 +145,15 @@ class LoginView(View):
             # 已勾选，需要记住cookie信息，两周后过期
             request.session.set_expiry(None)
         # 跳转到主页
-        return HttpResponse('登陆成功')
+        # 登陆成功，根据next参数决定跳转方向
+        next = request.GET.get('next')
+        if next is None:
+            # 如果是直接登陆成功，就重定向到首页
+            pass
+            # return redirect(reverse('goods:index'))
+        else:
+            # 如果是用户中心重定向到登陆页面，就回到用户中心
+            return redirect(next)
 
 
 class ActiveView(View):
