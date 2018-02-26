@@ -57,7 +57,6 @@ class UserInfoView(LoginRequiredMixin, View):
         return render(request, 'user_center_info.html', context)
 
 
-
 class AddressView(LoginRequiredMixin, View):
     """用户地址"""
     def get(self, request):
@@ -106,7 +105,7 @@ class LogoutView(View):
         # 由django用户认证系统完成, 需要清理cook和 session, request参数中有user对象
         logout(request)
         # 退出跳转, 由产品经理设计
-        return redirect(reverse('goods: index'))
+        return redirect(reverse('goods:index'))
 
 
 class LoginView(View):
@@ -150,7 +149,7 @@ class LoginView(View):
         if next is None:
             # 如果是直接登陆成功，就重定向到首页
             pass
-            # return redirect(reverse('goods:index'))
+            return redirect(reverse('goods:index'))
         else:
             # 如果是用户中心重定向到登陆页面，就回到用户中心
             return redirect(next)
