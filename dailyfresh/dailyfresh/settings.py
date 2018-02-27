@@ -144,3 +144,8 @@ SESSION_CACHE_ALIAS = "default"
 # 在使用装饰器@login_required时，需要配置settings.py文件
 # 用于指定装饰器@login_required验证失败后跳转到的路径
 LOGIN_URL = '/users/login'
+# 配置Django自定义的存储系统
+DEFAULT_FILE_STORAGE = 'utils.fastdfs.storage.FastDFSStorage'
+# FastFDS使用的配置信息
+CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
+SERVER_IP = 'http://192.168.243.193:8888/'
