@@ -40,6 +40,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 第三方应用
+    'tinymce',
     # 安装应用
     'cart',
     'goods',
@@ -98,9 +100,9 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-Hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -148,4 +150,11 @@ LOGIN_URL = '/users/login'
 DEFAULT_FILE_STORAGE = 'utils.fastdfs.storage.FastDFSStorage'
 # FastFDS使用的配置信息
 CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
-SERVER_IP = 'http://192.168.243.193:8888/'
+SERVER_IP = 'http://192.168.110.130:8888/'
+
+# 副文本编辑器
+TINYMCE_DEFAULT_CONFIG = {
+  'theme': 'advanced', # 丰富样式
+  'width': 600,
+  'height': 400,
+}

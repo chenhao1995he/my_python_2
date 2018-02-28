@@ -10,6 +10,7 @@ class FastDFSStorage(Storage):
         if client_conf is None:
             client_conf = settings.CLIENT_CONF
         self.client_conf = client_conf
+
         if server_ip is None:
             server_ip = settings.SERVER_IP
         self.server_ip = server_ip
@@ -23,17 +24,23 @@ class FastDFSStorage(Storage):
         client = Fdfs_client(self.client_conf)
         # 获取client获取文件的内容
         file_data = content.read()
-        # Django借助client向FastDFS服务器上传文件
-        result = client.upload_by_buffer(file_data)
+        try:
+            # Django借助client向FastDFS服务器上传文件
+            result = client.upload_by_buffer(file_data)
+        except Exception as e:
+            print(e)
+            print(1000)
+            raise
+
         # 根据返回数据, 并判断数据是否上传成功
-        if result.get('Status') == "Upload successed":
+        if result.get('Status') == 'Upload successed.':
             # 读取file_id
             file_id = result.get("Remote file_id")
             # 返回Django储存起来即可
             return file_id
         else:
             # 开发工具类时,出现异常不要擅自处理, 交给使用者处理
-            raise Exception('上传文件到FastDFS失败')
+            raise Exception('上传文件到FastDFS失败66666666')
 
     def exists(self, name):
         """Django用来判断文件是否存在的"""
