@@ -20,7 +20,7 @@
 	<div class="center_con clearfix">
 		<ul class="subnav fl">
             {% for category in categorys %}
-                <li><a href="#model0{{ forloop.counter }}" class="{{ category.logo }}">{{ category.name }}</a></li>
+                <li><a href="{% url 'goods:list' category.id 1%}" class="{{ category.logo }}">{{ category.name }}</a></li>
 
             {% endfor %}
             
@@ -40,7 +40,7 @@
 		</div>
 		<div class="adv fl">
             {% for promotion_banner in promotion_banners %}
-                <a href="#"><img src="{{ promotion_banner.image.url }}"></a>
+                <a href="{{  promotion_banner.image.url }}"><img src="{{ promotion_banner.image.url }}"></a>
             {% endfor %}
 
 
@@ -68,8 +68,8 @@
 			<ul class="goods_list fl">
                 {% for image_banners in category.image_banners %}
                     <li>
-                        <h4><a href="#">{{ image_banners.sku.name }}</a></h4>
-                        <a href="#"><img src="{{ image_banners.sku.default_image.url }}"></a>
+                        <h4><a href="{% url 'goods:detail' image_banners.sku.id %}">{{ image_banners.sku.name }}</a></h4>
+                        <a href="{% url 'goods:detail' image_banners.sku.id %}"><img src="{{ image_banners.sku.default_image.url }}"></a>
                         <div class="prize">{{ image_banners.sku.price }}</div>
                     </li>
 
